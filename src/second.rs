@@ -24,13 +24,10 @@ impl List {
     }
 
     pub fn pop(&mut self) -> Option<i32> {
-        match self.head.take() {
-            None => None,
-            Some(node) => {
-                self.head = node.next;
-                Some(node.elem)
-            }
-        }
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.elem
+        })
     }
 }
 
@@ -76,6 +73,5 @@ mod test {
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
     }
-}
 }
 

@@ -74,6 +74,7 @@ impl Drop for Node {
     fn drop(&mut self) {
         self.next.drop();
     }
+}
 
 #[cfg(test)]
 mod test{

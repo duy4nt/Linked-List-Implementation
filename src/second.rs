@@ -19,6 +19,17 @@ pub struct IterMut<'a, T> {
     next: Option<&'a mut Node<T>>,
 }
 
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.next.as_deref_mut();
+            &mut node.elem
+        })
+    }
+}
+
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
@@ -48,7 +59,13 @@ impl<T> List<T> {
         })
     }
 
-    pub fn peek(&mut self) -> Option<&mut T> {
+    pub fn peek(&self) -> Option<&T> {
+        self.head.as_ref().map(|node| {
+            &node.elem
+        })
+    }
+
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
         self.head.as_mut().map(|node| &mut node.elem)
     }
 
@@ -56,7 +73,7 @@ impl<T> List<T> {
         IntoIter(self)
     }
 
-    pub fn iter<'a>(&'a self) -> Iter<'a, T> {
+    pub fn iter(&self) -> Iter<'_, T> {
         Iter {
             next: self.head.as_deref()
         }
@@ -78,12 +95,12 @@ impl<T> Drop for List<T> {
 }
 
 impl<'a, T> Iterator for Iter<'a, T> {
-    type Item = &'a mut T;
+    type Item = &'a T;
 
         fn next(&mut self) -> Option<Self::Item> {
-        self.next.take().map(|node| {
-            self.next = node.next.as_deref_mut();
-            &mut node.elem
+            self.next.map(|node| {
+                self.next = node.next.as_deref();
+                &node.elem
         })
     }
 }
